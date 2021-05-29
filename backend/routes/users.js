@@ -3,7 +3,12 @@ var router = express.Router()
 
 /* GET users listing. */
 router.get('/', function (req, res) {
-  res.send('respond with a resource')
+  const user = {
+    id: 1,
+    name: 'John Doe',
+    emailAddress: 'johnny@test.com',
+  }
+  res.send(user)
 })
 
 module.exports = router
