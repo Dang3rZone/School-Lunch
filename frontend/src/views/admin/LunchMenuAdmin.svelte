@@ -1,15 +1,20 @@
 <script>
   import { onMount } from 'svelte'
   import { navigateTo } from 'svelte-router-spa'
+  import Icon from 'svelte-awesome'
+  import { refresh } from 'svelte-awesome/icons'
   import axios from 'axios'
   import { user } from '../../store/stores'
 
   let lunchWeekList = []
-
+  let loading = true
   onMount(async () => {
     try {
       let response = await axios.get('http://localhost:3000/api/lunch-week')
       lunchWeekList = response.data
+      await new Promise((wait) => setTimeout(wait, 800))
+      // spinner stops
+      loading = false
     } catch (e) {
       console.error('Error fetching data')
     }
@@ -30,21 +35,27 @@
       <li class="is-active"><a href="/#">{$user.schoolName}</a></li>
     </ul>
   </nav>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Week Of</th>
-        <th>Published</th>
-      </tr>
-    </thead>
-    {#each lunchWeekList as lunchWeek}
-      <tr
-        class="has-text-link"
-        style="cursor:pointer"
-        on:click="{openLunchWeekDetails(lunchWeek)}">
-        <td>{lunchWeek.weekOf}</td>
-        <td>{lunchWeek.isPublished}</td>
-      </tr>
-    {/each}
-  </table>
+  {#if loading}
+    <div class="section">
+      <Icon spin data="{refresh}" scale="3" />
+    </div>
+  {:else}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Week Of</th>
+          <th>Published</th>
+        </tr>
+      </thead>
+      {#each lunchWeekList as lunchWeek}
+        <tr
+          class="has-text-link"
+          style="cursor:pointer"
+          on:click="{openLunchWeekDetails(lunchWeek)}">
+          <td>{lunchWeek.weekOf}</td>
+          <td>{lunchWeek.isPublished}</td>
+        </tr>
+      {/each}
+    </table>
+  {/if}
 </div>
