@@ -1,5 +1,18 @@
 <script>
-  import { user } from '../../store/stores';
+  import { onMount } from 'svelte'
+  import axios from 'axios'
+  import { user } from '../../store/stores'
+
+  let lunchWeekList = []
+
+  onMount(async () => {
+    try {
+      let response = await axios.get('http://localhost:3000/api/lunch-week')
+      lunchWeekList = response.data
+    } catch (e) {
+      console.error('Error fetching data')
+    }
+  })
 
 </script>
 
@@ -11,4 +24,5 @@
       <li class="is-active"><a href="/#">{$user.schoolName}</a></li>
     </ul>
   </nav>
+  {JSON.stringify(lunchWeekList)}
 </div>

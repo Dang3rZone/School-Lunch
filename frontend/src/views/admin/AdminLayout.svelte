@@ -1,11 +1,11 @@
 <script>
-  import { Route } from 'svelte-router-spa';
-  import { onMount } from 'svelte';
-  import { user } from '../../store/stores';
+  import { Route } from 'svelte-router-spa'
+  import { onMount } from 'svelte'
+  import { user } from '../../store/stores'
 
-  export let currentRoute;
+  export let currentRoute
 
-  let initialized = false;
+  let initialized = false
 
   // lifecycle function
   onMount(() => {
@@ -13,14 +13,14 @@
     user.set({
       name: 'Test user',
       schoolName: 'Test school',
-    });
-    initialized = true;
-  });
+    })
+    initialized = true
+  })
 
 </script>
 
 <div>
   {#if initialized}
-    <Route.default {currentRoute} />
+    <Route.default currentRoute="{currentRoute}" />
   {/if}
 </div>

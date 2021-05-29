@@ -7,7 +7,10 @@ const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const lunchWeekRouter = require('./routes/lunch-week')
 
+const cors = require('cors')
 const app = express()
+app.use(cors())
+app.options('*', cors())
 
 app.use(logger('dev'))
 app.use(express.json())
