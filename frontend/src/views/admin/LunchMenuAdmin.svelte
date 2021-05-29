@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { navigateTo } from 'svelte-router-spa'
   import axios from 'axios'
   import { user } from '../../store/stores'
 
@@ -13,6 +14,11 @@
       console.error('Error fetching data')
     }
   })
+
+  const openLunchWeekDetails = (lunchWeek) => {
+    const route = `/admin/manage-menus/week-details/${lunchWeek.lunchWeekId}`
+    navigateTo(route)
+  }
 
 </script>
 
@@ -32,7 +38,7 @@
       </tr>
     </thead>
     {#each lunchWeekList as lunchWeek}
-      <tr>
+      <tr on:click="{openLunchWeekDetails(lunchWeek)}">
         <td>{lunchWeek.weekOf}</td>
         <td>{lunchWeek.isPublished}</td>
       </tr>
