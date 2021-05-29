@@ -38,7 +38,10 @@
       </tr>
     </thead>
     {#each lunchWeekList as lunchWeek}
-      <tr on:click="{openLunchWeekDetails(lunchWeek)}">
+      <tr
+        class="has-text-link"
+        style="cursor:pointer"
+        on:click="{openLunchWeekDetails(lunchWeek)}">
         <td>{lunchWeek.weekOf}</td>
         <td>{lunchWeek.isPublished}</td>
       </tr>
