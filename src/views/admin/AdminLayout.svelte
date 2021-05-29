@@ -14,10 +14,13 @@
       name: 'Test user',
       schoolName: 'Test school',
     });
+    initialized = true;
   });
 
 </script>
 
 <div>
-  <Route.default {currentRoute} />
+  {#if initialized}
+    <Route.default {currentRoute} />
+  {/if}
 </div>
