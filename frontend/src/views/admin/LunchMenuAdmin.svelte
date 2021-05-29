@@ -24,5 +24,18 @@
       <li class="is-active"><a href="/#">{$user.schoolName}</a></li>
     </ul>
   </nav>
-  {JSON.stringify(lunchWeekList)}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Week Of</th>
+        <th>Published</th>
+      </tr>
+    </thead>
+    {#each lunchWeekList as lunchWeek}
+      <tr>
+        <td>{lunchWeek.weekOf}</td>
+        <td>{lunchWeek.isPublished}</td>
+      </tr>
+    {/each}
+  </table>
 </div>
