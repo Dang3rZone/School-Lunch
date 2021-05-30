@@ -1,24 +1,23 @@
 <script>
   import { onMount } from 'svelte'
   import { navigateTo } from 'svelte-router-spa'
+  import axios from 'axios'
   import Icon from 'svelte-awesome'
   import { refresh, times } from 'svelte-awesome/icons'
-  import axios from 'axios'
-  import { user } from '../../store/stores'
+  import { user } from '../../store/stores.js'
 
   let lunchWeekList = []
   let loading = true
-  let showModal = false
+  let showDeleteModal = false
+  let weekToDelete = {}
 
   onMount(async () => {
     try {
-      let response = await axios.get(`${process.env.API_ROOT}/api/lunch-week`)
+      const response = await axios.get(`${process.env.API_ROOT}/api/lunch-week`)
       lunchWeekList = response.data
-      await new Promise((wait) => setTimeout(wait, 800))
-      // spinner stops
       loading = false
     } catch (e) {
-      console.error('Error fetching data')
+      console.error(e)
     }
   })
 
@@ -27,16 +26,19 @@
     navigateTo(route)
   }
 
+  const openDeleteModal = (lunchWeek) => {
+    weekToDelete = lunchWeek
+    showDeleteModal = true
+  }
+
   const deleteLunchWeek = async (lunchWeek) => {
+    showDeleteModal = false
     const lunchWeekId = lunchWeek.lunchWeekId
     try {
-      // show the loading spinner and call the delete endpoint
       loading = true
       await axios.delete(
         `${process.env.API_ROOT}/api/lunch-week/${lunchWeekId}`
       )
-
-      // find the index of the passed in lunchWeek and use splice to remove it
       const deletedIndex = lunchWeekList.findIndex(
         (x) => x.lunchWeekId === lunchWeekId
       )
@@ -82,17 +84,42 @@
         <tr>
           <td
             class="has-text-link clickable"
-            on:click="{openLunchWeekDetails(lunchWeek)}">
+            on:click="{() => openLunchWeekDetails(lunchWeek)}">
             {lunchWeek.weekOf}
           </td>
           <td>{lunchWeek.isPublished}</td>
           <td
             class="has-text-danger clickable"
-            on:click="{deleteLunchWeek(lunchWeek)}">
+            on:click="{() => openDeleteModal(lunchWeek)}">
             <Icon style="margin-top: 4px;" data="{times}" />
           </td>
         </tr>
       {/each}
     </table>
   {/if}
+</div>
+
+<div class="{showDeleteModal ? 'modal is-active' : 'modal'}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Warning</p>
+      <button
+        class="delete"
+        on:click="{() => (showDeleteModal = false)}"
+        aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      Delete Week of
+      {weekToDelete.weekOf}?
+    </section>
+    <footer class="modal-card-foot">
+      <button
+        class="button is-success"
+        on:click="{() => deleteLunchWeek(weekToDelete)}">Continue</button>
+      <button
+        class="button"
+        on:click="{() => (showDeleteModal = false)}">Cancel</button>
+    </footer>
+  </div>
 </div>
