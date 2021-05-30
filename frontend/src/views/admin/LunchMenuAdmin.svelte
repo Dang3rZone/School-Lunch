@@ -2,12 +2,14 @@
   import { onMount } from 'svelte'
   import { navigateTo } from 'svelte-router-spa'
   import Icon from 'svelte-awesome'
-  import { refresh } from 'svelte-awesome/icons'
+  import { refresh, times } from 'svelte-awesome/icons'
   import axios from 'axios'
   import { user } from '../../store/stores'
 
   let lunchWeekList = []
   let loading = true
+  let showModal = false
+
   onMount(async () => {
     try {
       let response = await axios.get(`${process.env.API_ROOT}/api/lunch-week`)
@@ -25,7 +27,35 @@
     navigateTo(route)
   }
 
+  const deleteLunchWeek = async (lunchWeek) => {
+    const lunchWeekId = lunchWeek.lunchWeekId
+    try {
+      // show the loading spinner and call the delete endpoint
+      loading = true
+      await axios.delete(
+        `${process.env.API_ROOT}/api/lunch-week/${lunchWeekId}`
+      )
+
+      // find the index of the passed in lunchWeek and use splice to remove it
+      const deletedIndex = lunchWeekList.findIndex(
+        (x) => x.lunchWeekId === lunchWeekId
+      )
+      lunchWeekList.splice(deletedIndex, 1)
+      loading = false
+    } catch (e) {
+      loading = false
+      console.error(e)
+    }
+  }
+
 </script>
+
+<style>
+  .clickable {
+    cursor: pointer;
+  }
+
+</style>
 
 <div>
   <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -45,15 +75,22 @@
         <tr>
           <th>Week Of</th>
           <th>Published</th>
+          <th></th>
         </tr>
       </thead>
       {#each lunchWeekList as lunchWeek}
-        <tr
-          class="has-text-link"
-          style="cursor:pointer"
-          on:click="{openLunchWeekDetails(lunchWeek)}">
-          <td>{lunchWeek.weekOf}</td>
+        <tr>
+          <td
+            class="has-text-link clickable"
+            on:click="{openLunchWeekDetails(lunchWeek)}">
+            {lunchWeek.weekOf}
+          </td>
           <td>{lunchWeek.isPublished}</td>
+          <td
+            class="has-text-danger clickable"
+            on:click="{deleteLunchWeek(lunchWeek)}">
+            <Icon style="margin-top: 4px;" data="{times}" />
+          </td>
         </tr>
       {/each}
     </table>
