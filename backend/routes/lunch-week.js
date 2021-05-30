@@ -1,32 +1,25 @@
 const express = require('express')
 const router = express.Router()
+const knex = require('../database/client')
 
-const lunchWeekList = [
-  {
-    lunchWeekId: 1,
-    weekOf: '2021-10-05',
-    isPublished: true,
-  },
-  {
-    lunchWeekId: 2,
-    weekOf: '2021-10-12',
-    isPublished: true,
-  },
-  {
-    lunchWeekId: 3,
-    weekOf: '2021-10-19',
-    isPublished: false,
-  },
-]
+// select all the rows from the lunch_week table
+const getLunchWeekList = () => {
+  return knex.select().from('lunch_week').orderBy('week_of')
+}
 
-router.get('/', function (req, res) {
+const getLunchWeekById = (id) => {
+  return knex.select().from('lunch_week').where('lunch_week_id', id).first()
+}
+
+// Call the helper function in our endpoint. Knex database queries
+router.get('/', async function (req, res) {
+  const lunchWeekList = await getLunchWeekList()
   res.send(lunchWeekList)
 })
 
-router.get('/:lunchWeekId', function (req, res) {
+router.get('/:lunchWeekId', async function (req, res) {
   const id = parseInt(req.params.lunchWeekId)
-  // find => first matching entity from the list
-  const lunchWeek = lunchWeekList.find((x) => x.lunchWeekId === id)
+  const lunchWeek = await getLunchWeekById(id)
   if (lunchWeek) {
     res.send(lunchWeek)
   } else {
