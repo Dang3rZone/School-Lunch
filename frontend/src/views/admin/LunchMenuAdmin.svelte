@@ -10,6 +10,8 @@
   let loading = true
   let showDeleteModal = false
   let weekToDelete = {}
+  let showCreateModal = false
+  let createWeekOfDate = null
 
   onMount(async () => {
     try {
@@ -21,9 +23,43 @@
     }
   })
 
+  const openCreateModal = () => {
+    showCreateModal = true
+  }
+
   const openLunchWeekDetails = (lunchWeek) => {
     const route = `/admin/manage-menus/week-details/${lunchWeek.lunchWeekId}`
     navigateTo(route)
+  }
+
+  const createLunchWeek = async () => {
+    showCreateModal = false
+    let newLunchWeek = {
+      // createWeekOfDate will contain the input from the user
+      weekOf: createWeekOfDate,
+      isPublished: false,
+    }
+    try {
+      loading = true
+
+      // since this is a POST, we need to send a lunchWeek object as the body of the request
+      const response = await axios.post(
+        `${process.env.API_ROOT}/api/lunch-week`,
+        newLunchWeek
+      )
+      const lunchWeekId = response.data.lunchWeekId
+
+      // populate the newLunchWeek with the id from the server response
+      newLunchWeek.lunchWeekId = lunchWeekId
+
+      // push the result into lunchWeek list, so that
+      // Svelte will update the table
+      lunchWeekList.push(newLunchWeek)
+      loading = false
+    } catch (e) {
+      loading = false
+      console.error(e)
+    }
   }
 
   const openDeleteModal = (lunchWeek) => {
@@ -72,6 +108,10 @@
       <Icon spin data="{refresh}" scale="3" />
     </div>
   {:else}
+    <button
+      class="button is-text is-small mb-1"
+      on:click="{() => openCreateModal()}">
+      Add Lunch Week</button>
     <table class="table">
       <thead>
         <tr>
@@ -99,6 +139,7 @@
   {/if}
 </div>
 
+<!-- DELETE modal -->
 <div class="{showDeleteModal ? 'modal is-active' : 'modal'}">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -120,6 +161,41 @@
       <button
         class="button"
         on:click="{() => (showDeleteModal = false)}">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+<!-- PUT modal -->
+<div class="{showCreateModal ? 'modal is-active' : 'modal'}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Create Lunch Week</p>
+      <button
+        class="delete"
+        on:click="{() => (showCreateModal = false)}"
+        aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="field">
+        <label class="label">Week Of</label>
+        <div class="control">
+          <!-- bind users input for the Week Of Date to the createWeekOfDate state var -->
+          <input
+            bind:value="{createWeekOfDate}"
+            type="date"
+            class="input"
+            placeholder="yyyy-mm-dd" />
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <button
+        class="button is-success"
+        on:click="{() => createLunchWeek()}">Continue</button>
+      <button
+        class="button"
+        on:click="{() => (showCreateModal = false)}">Cancel</button>
     </footer>
   </div>
 </div>
