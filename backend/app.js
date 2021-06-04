@@ -7,7 +7,7 @@ const logger = require('morgan')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const lunchWeekRouter = require('./routes/lunch-week')
-
+const passKnex = require('./database/dynamic-knex')
 const authenticateJwt = require('./authenticate-jwt')
 
 const cors = require('cors')
@@ -25,7 +25,7 @@ const router = express.Router()
 
 router.use('/', indexRouter)
 router.use('/users', usersRouter)
-router.use('/lunch-week', authenticateJwt, lunchWeekRouter)
+router.use('/lunch-week', [authenticateJwt, passKnex], lunchWeekRouter)
 
 app.use('/api', router)
 

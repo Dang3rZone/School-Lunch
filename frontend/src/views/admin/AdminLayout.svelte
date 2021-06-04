@@ -9,7 +9,28 @@
   let initialized = false
   let auth0
 
-  // lifecycle function
+  const parseJwt = (token) => {
+    var base64Url = token.split('.')[1]
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    var jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        })
+        .join('')
+    )
+
+    return JSON.parse(jsonPayload)
+  }
+
+  const logout = async () => {
+    window.localStorage.removeItem('access_token')
+    auth0.logout({
+      returnTo: window.location.origin,
+    })
+  }
+
   onMount(async () => {
     auth0 = await createAuth0Client(auth0Config)
     const authenticated = await auth0.isAuthenticated()
@@ -20,19 +41,13 @@
         appState: window.location.pathname,
       })
     } else {
-      user.set({
-        name: 'Test User',
-        schoolName: 'Test School',
-      })
+      const token = await auth0.getTokenSilently()
+      // parse the JWT and set the user store based on the JWT metadata
+      const parsedJwt = parseJwt(token)
+      user.set({ schoolName: parsedJwt['https://school-lunch/school_name'] })
       initialized = true
     }
   })
-
-  const logout = () => {
-    auth0.logout({
-      returnTo: window.location.origin,
-    })
-  }
 
 </script>
 
