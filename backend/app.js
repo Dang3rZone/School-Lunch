@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
@@ -6,6 +7,8 @@ const logger = require('morgan')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const lunchWeekRouter = require('./routes/lunch-week')
+
+const authenticateJwt = require('./authenticate-jwt')
 
 const cors = require('cors')
 const app = express()
@@ -22,7 +25,7 @@ const router = express.Router()
 
 router.use('/', indexRouter)
 router.use('/users', usersRouter)
-router.use('/lunch-week', lunchWeekRouter)
+router.use('/lunch-week', authenticateJwt, lunchWeekRouter)
 
 app.use('/api', router)
 

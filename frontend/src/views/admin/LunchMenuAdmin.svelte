@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { navigateTo } from 'svelte-router-spa'
-  import axios from 'axios'
+  import axios from '../../axios-global'
   import Icon from 'svelte-awesome'
   import { refresh, times } from 'svelte-awesome/icons'
   import { user } from '../../store/stores.js'
