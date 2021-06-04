@@ -15,6 +15,10 @@ const updateLunchWeek = (id, lunchWeek) => {
   return knex('lunch_week').where('lunch_week_id', id).update(lunchWeek)
 }
 
+const getLunchDayList = (lunchWeekId) => {
+  return knex.select().from('lunch_day').where('lunch_week_id', lunchWeekId)
+}
+
 const deleteLunchWeek = (lunchWeekId) => {
   return knex('lunch_week').where('lunch_week_id', lunchWeekId).del()
 }
@@ -51,7 +55,11 @@ router.get('/:lunchWeekId', async function (req, res) {
   try {
     const id = parseInt(req.params.lunchWeekId)
     const lunchWeek = await getLunchWeekById(id)
+
     if (lunchWeek) {
+      // fetching the lunch days
+      let lunchDays = await getLunchDayList(id)
+      lunchWeek.lunchDays = lunchDays
       res.send(lunchWeek)
     } else {
       const message = `Lunch Week Id ${req.params.lunchWeekId} not found`
