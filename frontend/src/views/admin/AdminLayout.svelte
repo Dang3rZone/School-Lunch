@@ -7,10 +7,11 @@
 
   export let currentRoute
   let initialized = false
+  let auth0
 
   // lifecycle function
   onMount(async () => {
-    let auth0 = await createAuth0Client(auth0Config)
+    auth0 = await createAuth0Client(auth0Config)
     const authenticated = await auth0.isAuthenticated()
 
     if (!authenticated) {
@@ -27,8 +28,10 @@
     }
   })
 
-  const logout = async () => {
-    // todo
+  const logout = () => {
+    auth0.logout({
+      returnTo: window.location.origin,
+    })
   }
 
 </script>
