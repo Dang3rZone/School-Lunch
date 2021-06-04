@@ -12,6 +12,8 @@
     // stores are written to be calling set
     user.set({
       name: 'Test user',
+
+      
       schoolName: 'Test school',
     })
     initialized = true
