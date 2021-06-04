@@ -1,2 +1,4 @@
 
 backend/knexfile.js
+
+frontend/src/auth0-config.js
